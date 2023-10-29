@@ -35,15 +35,16 @@ app.post('/signup', (req, res)=>{
 app.post('/login', async(req, res)=>{
     const{email, password}=req.body;
     const isUser=await UserModel.findOne({email})
+    
     if(isUser){
         const hashedPassword=isUser.password;
         const result=bcrypt.compareSync(password, hashedPassword);
         if(result){
-            const token=jwt.sign({ foo: 'bar' }, process.env.SECRET_KEY, (err, token)=>{
+            const token=jwt.sign({isUser:isUser}, process.env.SECRET_KEY, (err, token)=>{
                 if(err){
                     res.send({message:"Login Failed!"})
                 }else{
-                    res.send({message:"Login Successfully...", token:token})
+                    res.send({message:"Login Successfully...", user:isUser, token:token })
                 }
             })
         }else{
